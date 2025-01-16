@@ -84,7 +84,7 @@ const Dashboard = () => {
         console.log(langchainResponse); // Log the entire response
         console.log(langchainResponse.text); // Access the pdfpath
 
-        alert(langchainResponse.answer);
+        alert("Exceeded access token limit");
       })
       .catch((error) => {
         console.error("Error fetching answer from PDF:", error); // Handle any errors

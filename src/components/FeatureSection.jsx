@@ -1,18 +1,30 @@
 import { features } from "../constants";
-
+import vectorimg from "../assets/image1.png";
 const FeatureSection = () => {
   return (
     <div className="relative mt-20 border-b border-neutral-800 min-h-[800px]">
       <div className="text-center">
         <span className="bg-neutral-900 text-orange-500 rounded-full h-6 text-sm font-medium px-2 py-1 uppercase">
-          Feature
+          About
         </span>
         <h2 className="text-3xl sm:text-5xl lg:text-6xl mt-10 lg:mt-20 tracking-wide">
-          Easily build{" "}
+          How This App Answers &nbsp;
           <span className="bg-gradient-to-r from-orange-500 to-orange-800 text-transparent bg-clip-text">
-            your code
+            PDF or DOC Queries
           </span>
         </h2>
+      </div>
+      <div className="container mx-auto p-4">
+        <div className="flex flex-col md:flex-row space-y-4 md:space-y-0">
+          {/* First Image */}
+          <div className="w-full ">
+            <img
+              src={vectorimg}
+              alt="vectorimg"
+              className="w-full h-auto object-cover"
+            />
+          </div>
+        </div>
       </div>
       <div className="flex flex-wrap mt-10 lg:mt-20">
         {features.map((feature, index) => (
