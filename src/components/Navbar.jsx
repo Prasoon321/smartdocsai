@@ -9,7 +9,7 @@ import Joyride, { STATUS } from "react-joyride";
 import "./modal.css";
 const Navbar = () => {
   const navigate = useNavigate();
-
+  const [usercred, Setusercred] = useState({});
   const [showAlert, setShowAlert] = useState(false);
   const [{ run, steps }, setState] = useState({
     run: false,

@@ -159,7 +159,7 @@ const Dashboard = () => {
                 {pdfUrls.map((pdf, index) => (
                   <li
                     key={index}
-                    className="flex items-center justify-between p-2 border rounded-md bg-gray-100"
+                    className="flex items-center  p-2 border rounded-md bg-gray-100"
                   >
                     <span
                       className="truncate"
@@ -250,7 +250,7 @@ const Dashboard = () => {
         dismissible
         show={openModal}
         onClose={() => setOpenModal(false)}
-        className="custom-modal"
+        style={{ position: "absolute", width: "70%", left: "255px" }}
       >
         <Modal.Header>Upload PDFs for Doc</Modal.Header>
         <Modal.Body>
