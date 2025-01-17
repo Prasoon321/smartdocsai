@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
 import { Button, Modal } from "flowbite-react";
 import { useNavigate } from "react-router-dom";
+import PdfComp from "./Pdf";
 import "./dashboard.css";
+import "./modal.css";
 
 const Dashboard = () => {
   const [pdfFile, setPdfFile] = useState(null);
+  const [selectedPDF, setSelectedPDF] = useState(null);
   const [pdfUrls, setPdfUrls] = useState([]);
   const [messages, setMessages] = useState([]);
   const [selectedPdfUrl, setSelectedPdfUrl] = useState(null);
@@ -26,6 +29,10 @@ const Dashboard = () => {
     const file = files[0]; // Get the first file (as we are only allowing one file)
 
     if (file) {
+      const fileURL = URL.createObjectURL(file);
+      setSelectedPDF(fileURL);
+    }
+    if (file) {
       setPdfFile(file); // Set the selected file in state
       setOpenModal(false); // Close modal if necessary
       handleSubmit(file); // Call the handleSubmit function with the selected file
@@ -35,6 +42,16 @@ const Dashboard = () => {
     }
   };
 
+  const handleFileDrop = (files) => {
+    if (files && files.length > 0) {
+      const file = files[0];
+      if (file.type === "application/pdf") {
+        handleSubmit(file); // Pass the file to handleSubmit
+      } else {
+        alert("Please upload a valid PDF file.");
+      }
+    }
+  };
   const handleSubmit = async (file) => {
     if (!file) {
       alert("File is not uploaded ");
@@ -51,7 +68,15 @@ const Dashboard = () => {
     // Create FormData and append fields
     formDatacloud.append("pdf", file); // Append the file
     formData.append("pdf", file); // Append the file
+    const newPdf = { name: file.name };
 
+    // Update pdfUrls by adding the new PDF without overwriting the state
+
+    setPdfUrls((prevPdfUrls) => {
+      const updatedPdfUrls = [...prevPdfUrls, newPdf];
+      localStorage.setItem("pdfUrls", JSON.stringify(updatedPdfUrls)); // Save to localStorage
+      return updatedPdfUrls;
+    });
     // Send the PDF to Node.js for Cloudinary upload
     fetch("http://localhost:3000/api/upload-pdf", {
       method: "POST",
@@ -61,15 +86,6 @@ const Dashboard = () => {
       .then((cloudinaryResponse) => {
         console.log(cloudinaryResponse); // Log the entire response
         console.log(cloudinaryResponse.pdfpath); // Access the pdfpath
-
-        const newPdf = { name: file.name, path: cloudinaryResponse.pdfpath };
-
-        // Update pdfUrls by adding the new PDF without overwriting the state
-        setPdfUrls((prevPdfUrls) => {
-          const updatedPdfUrls = [...prevPdfUrls, newPdf];
-          localStorage.setItem("pdfUrls", JSON.stringify(updatedPdfUrls)); // Save to localStorage
-          return updatedPdfUrls;
-        });
       })
       .catch((error) => {
         console.error("Error uploading PDF:", error); // Handle any errors
@@ -217,9 +233,25 @@ const Dashboard = () => {
           <button onClick={handleSendMessage}>Send</button>
         </div>
       </div>
-
+      {/* Pdf show container  */}
+      {selectedPDF && (
+        <div
+          style={{
+            width: "30%",
+            borderLeft: "1px solid #ccc",
+            padding: "1rem",
+          }}
+        >
+          <PdfComp pdfUrl={selectedPDF} />
+        </div>
+      )}
       {/* Modal pop-up */}
-      <Modal dismissible show={openModal} onClose={() => setOpenModal(false)}>
+      <Modal
+        dismissible
+        show={openModal}
+        onClose={() => setOpenModal(false)}
+        className="custom-modal"
+      >
         <Modal.Header>Upload PDFs for Doc</Modal.Header>
         <Modal.Body>
           {/* Drag and Drop Section */}
