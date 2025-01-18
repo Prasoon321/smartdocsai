@@ -1,140 +1,102 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button, Modal } from "flowbite-react";
-import { useNavigate } from "react-router-dom";
-import PdfComp from "./Pdf";
+// import { useNavigate } from "react-router-dom";
+// import PdfComp from "./Pdf";
 import "./dashboard.css";
 import "./modal.css";
 
 const Dashboard = () => {
-  const [pdfFile, setPdfFile] = useState(null);
-  const [selectedPDF, setSelectedPDF] = useState(null);
-  const [pdfUrls, setPdfUrls] = useState([]);
-  const [messages, setMessages] = useState([]);
-  const [selectedPdfUrl, setSelectedPdfUrl] = useState(null);
-  const [input, setInput] = useState("");
   const [sidebarVisible, setSidebarVisible] = useState(true);
   const [openModal, setOpenModal] = useState(false);
-  const [uploadedFiles, setUploadedFiles] = useState([]);
-  const pdfurl = [];
-  const navigate = useNavigate();
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState("");
+  const [file, setFile] = useState(null); // To store uploaded file
+  const [fileName, setFileName] = useState(""); // To store the file name
+  // const [selectedPDF, setSelectedPDF] = useState(null);
 
-  useEffect(() => {
-    // Load PDF URLs from localStorage on component mount
-    const storedPdfUrls = JSON.parse(localStorage.getItem("pdfUrls")) || [];
-    setPdfUrls(storedPdfUrls);
-    console.log(storedPdfUrls);
-  }, []);
-
-  const handleFileUploadmain = (files) => {
-    const file = files[0]; // Get the first file (as we are only allowing one file)
-
-    if (file) {
-      const fileURL = URL.createObjectURL(file);
-      setSelectedPDF(fileURL);
-    }
-    if (file) {
-      setPdfFile(file); // Set the selected file in state
-      setOpenModal(false); // Close modal if necessary
-      handleSubmit(file); // Call the handleSubmit function with the selected file
-      console.log("File selected:", file);
-    } else {
-      alert("Please select a valid file.");
-    }
-  };
-
-  const handleFileDrop = (files) => {
-    if (files && files.length > 0) {
-      const file = files[0];
-      if (file.type === "application/pdf") {
-        handleSubmit(file); // Pass the file to handleSubmit
-      } else {
-        alert("Please upload a valid PDF file.");
-      }
-    }
-  };
-  const handleSubmit = async (file) => {
-    if (!file) {
-      alert("File is not uploaded ");
-      return;
-    }
-
+  // const asking query from the langchain
+  const queryUpload = (message, file) => {
     const formData = new FormData();
-    const formDatacloud = new FormData();
-    const userinfo = JSON.parse(localStorage.getItem("user"));
-    if (!userinfo) {
-      throw new Error("User information not found");
-    }
+    formData.append("pdf", file); // 'pdf' matches the backend's expected parameter name
+    formData.append("query", message);
 
-    // Create FormData and append fields
-    formDatacloud.append("pdf", file); // Append the file
-    formData.append("pdf", file); // Append the file
-    const newPdf = { name: file.name };
+    console.log(message);
+    console.log(file); // Add user message to the request
 
-    // Update pdfUrls by adding the new PDF without overwriting the state
-
-    setPdfUrls((prevPdfUrls) => {
-      const updatedPdfUrls = [...prevPdfUrls, newPdf];
-      localStorage.setItem("pdfUrls", JSON.stringify(updatedPdfUrls)); // Save to localStorage
-      return updatedPdfUrls;
-    });
-    // Send the PDF to Node.js for Cloudinary upload
-    fetch("http://localhost:3000/api/upload-pdf", {
+    // Step 5: Send FormData to FastAPI
+    fetch("https://smartdocaifastapi-1.onrender.com/api/ask-query", {
       method: "POST",
-      body: formDatacloud,
+      body: formData,
     })
-      .then((response) => response.json()) // Parse the JSON response
-      .then((cloudinaryResponse) => {
-        console.log(cloudinaryResponse); // Log the entire response
-        console.log(cloudinaryResponse.pdfpath); // Access the pdfpath
-      })
-      .catch((error) => {
-        console.error("Error uploading PDF:", error); // Handle any errors
-      });
-
-    fetch("http://127.0.0.1:8000/api/ask-query", {
-      method: "POST",
-      body: formDatacloud,
-    })
-      .then((response) => response.json()) // Parse the JSON response
+      .then((response) => response.json())
       .then((langchainResponse) => {
-        console.log(langchainResponse); // Log the entire response
-        console.log(langchainResponse.text); // Access the pdfpath
-
-        alert("Exceeded access token limit");
+        // Check if 'answer' exists in the response
+        if (langchainResponse && langchainResponse.answer) {
+          const botMessage = langchainResponse.answer;
+          setMessages((prevMessages) => {
+            const updatedMessages = [...prevMessages];
+            updatedMessages[updatedMessages.length - 1] = {
+              type: "bot",
+              text: botMessage,
+            };
+            return updatedMessages;
+          });
+        } else {
+          // Handle the case when there is no answer in the response
+          setMessages((prevMessages) => {
+            const updatedMessages = [...prevMessages];
+            updatedMessages[updatedMessages.length - 1] = {
+              type: "bot",
+              text: "Sorry, I couldn't find an answer similar to your question in context to the pdf",
+            };
+            return updatedMessages;
+          });
+        }
       })
       .catch((error) => {
-        console.error("Error fetching answer from PDF:", error); // Handle any errors
+        console.error("Error fetching answer from PDF:", error);
       });
   };
 
-  const handleRemoveFile = (url) => {
-    // Remove the PDF URL from the array
-    const updatedPdfUrls = pdfUrls.filter((pdfUrl) => pdfUrl.path !== url);
-
-    // Save the updated list to localStorage
-    localStorage.setItem("pdfUrls", JSON.stringify(updatedPdfUrls));
-
-    // Update the state
-    setPdfUrls(updatedPdfUrls);
-    setSelectedPdfUrl(null);
+  // Handle drag and drop
+  const handleFileDrop = (files) => {
+    const uploadedFile = files[0];
+    if (uploadedFile) {
+      setFile(uploadedFile);
+      setFileName(uploadedFile.name);
+    }
   };
 
-  const handleViewFile = (url) => {
-    // Assuming pdf.path contains a unique ID or URL
-    navigate(`${encodeURIComponent(url)}`);
+  // Handle file upload via input
+  const handleFileUpload = (files) => {
+    const uploadedFile = files[0];
+    if (uploadedFile) {
+      setFile(uploadedFile);
+      setFileName(uploadedFile.name);
+    }
   };
+
+  // Handle file removal
+  const handleRemoveFile = () => {
+    setFile(null);
+    setFileName("");
+  };
+  // Step 1: Handle user clicking the "Send" button or pressing Enter
   const handleSendMessage = () => {
-    if (input.trim()) {
-      setMessages([...messages, { type: "user", text: input }]);
-      setInput("");
+    // Step 2: Capture input and file
+    if (input.trim() || file) {
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { type: "user", text: input }, // Add user message
+        { type: "bot", text: "Wait..." }, // Add bot message that says "Wait..."
+      ]); // Add "Wait..." as a bot message immediately
 
-      // Simulate a response
-      setTimeout(() => {
-        setMessages((prev) => [
-          ...prev,
-          { type: "bot", text: "This is a response based on the PDF content." },
-        ]);
-      }, 1000);
+      // Clear input and file after sending
+      setInput("");
+      setFile(null);
+
+      // Step 3: Prepare FormData for file upload
+      queryUpload(input, file);
     }
   };
 
@@ -152,49 +114,27 @@ const Dashboard = () => {
           </label>
 
           {/* Uploaded File Section */}
-          {pdfUrls.length > 0 && (
-            <div className="mt-4">
-              <h3 className="text-lg font-medium">Uploaded PDFs:</h3>
-              <ul className="mt-2 space-y-2">
-                {pdfUrls.map((pdf, index) => (
-                  <li
-                    key={index}
-                    className="flex items-center  p-2 border rounded-md bg-gray-100"
-                  >
-                    <span
-                      className="truncate"
-                      style={{ color: "black", marginRight: "10px" }}
-                    >
-                      {pdf.name}
-                    </span>
-                    <div className="flex space-x-2">
-                      {/* Eye Icon */}
-                      <button
-                        className="text-blue-500 hover:text-blue-700"
-                        onClick={() => handleViewFile(pdf.path)}
-                        style={{
-                          color: "black",
-                          marginRight: "5px",
-                          fontSize: "30px",
-                        }}
-                      >
-                        &#128065; {/* Eye Icon */}
-                      </button>
-                      {/* Cross Icon */}
-                      <button
-                        className="text-red-500 hover:text-red-700"
-                        onClick={() => handleRemoveFile(pdf.path)}
-                        style={{
-                          color: "black",
-                          fontSize: "20px",
-                        }}
-                      >
-                        &#x2715; {/* Cross Icon */}
-                      </button>
-                    </div>
-                  </li>
-                ))}
-              </ul>
+          {file && fileName && (
+            <div className="file-info flex items-center justify-between mt-4 p-2 border rounded-md shadow-lg hover:shadow-xl transition-all">
+              <div className="file-name text-gray-800">{fileName}</div>
+              <div className="file-actions flex items-center space-x-2">
+                {/* Open PDF Icon (assuming you have a method to show PDF) */}
+                <button
+                  className="text-blue-600"
+                  onClick={() =>
+                    window.open(URL.createObjectURL(file), "_blank")
+                  }
+                >
+                  <i className="fas fa-eye"></i>{" "}
+                  {/* Eye Icon for showing PDF */}
+                </button>
+
+                {/* Remove File Icon */}
+                <button className="text-red-600" onClick={handleRemoveFile}>
+                  <i className="fas fa-times-circle"></i>{" "}
+                  {/* Cross Icon to remove */}
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -211,7 +151,10 @@ const Dashboard = () => {
             <span>{"<"}</span>
             <span>{"<"}</span>
           </div>
-          <h3>Ask Questions</h3>
+          <h3>Step 1 : Select One Pdf at a time</h3>
+          <h3 style={{ marginRight: "20px" }}>
+            Step 2 : Ask Questions from your selected pdf
+          </h3>
         </div>
 
         <div className="chat-messages">
@@ -234,7 +177,7 @@ const Dashboard = () => {
         </div>
       </div>
       {/* Pdf show container  */}
-      {selectedPDF && (
+      {/* {selectedPDF && (
         <div
           style={{
             width: "30%",
@@ -244,7 +187,7 @@ const Dashboard = () => {
         >
           <PdfComp pdfUrl={selectedPDF} />
         </div>
-      )}
+      )} */}
       {/* Modal pop-up */}
       <Modal
         dismissible
@@ -269,7 +212,7 @@ const Dashboard = () => {
             <input
               type="file"
               accept=".pdf, .doc, .docx"
-              onChange={(e) => handleFileUploadmain(e.target.files)} // Handle file selection
+              onChange={(e) => handleFileUpload(e.target.files)} // Handle file selection
               className="hidden"
               id="file-input"
             />
