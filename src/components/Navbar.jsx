@@ -133,7 +133,6 @@ const Navbar = () => {
                 <a
                   className=" py-2 px-3 rounded-md flex items-center justify-center"
                   style={{ cursor: "pointer" }}
-                  onClick={handleLogin}
                   id="stepsaccount"
                 >
                   <div
@@ -146,6 +145,7 @@ const Navbar = () => {
                       justifyContent: "center",
                       alignItems: "center",
                     }}
+                    onClick={handleLogin}
                   >
                     <img
                       src={userdeatil.photo}
