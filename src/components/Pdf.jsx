@@ -1,15 +1,15 @@
 // PDFViewer.jsx
 import { Worker, Viewer } from "@react-pdf-viewer/core";
-import "@react-pdf-viewer/core/lib/styles/index.css";
+import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 import { useEffect, useState } from "react";
 
-const PdfComp = ({ pdfUrl }) => {
+const Pdf = ({ pdfUrl }) => {
   const [validUrl, setValidUrl] = useState(null);
 
   useEffect(() => {
-    // Validate pdfUrl is not null and create a valid URL if necessary
     if (pdfUrl) {
-      setValidUrl(pdfUrl); // Set the valid URL for the viewer
+      console.log("PDF URL:", pdfUrl);
+      setValidUrl(pdfUrl);
     }
   }, [pdfUrl]);
 
@@ -18,7 +18,24 @@ const PdfComp = ({ pdfUrl }) => {
   }
 
   return (
-    <div style={{ height: "100%", overflow: "auto" }}>
+    <div
+      style={{
+        height: "80vh", // Set a maximum height relative to the viewport
+        width: "80vw", // Set a maximum width relative to the viewport
+        maxHeight: "80%", // Ensure it doesn't exceed 80% of the screen height
+        maxWidth: "80%", // Ensure it doesn't exceed 80% of the screen width
+        overflow: "auto",
+        position: "fixed", // Fixes it in the center of the viewport
+        top: "50%", // Centers vertically
+        left: "50%", // Centers horizontally
+        transform: "translate(-50%, -50%)", // Adjusts position to be perfectly centered
+        background: "#fff", // Optional: Background color for contrast
+        boxShadow: "rgba(0, 0, 0, 0.1) 0px 4px 12px", // Adds a subtle shadow
+        borderRadius: "8px", // Optional: Rounded corners for aesthetics
+        padding: "16px",
+        zIndex: 999, // Optional: Padding inside the container
+      }}
+    >
       <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js">
         <Viewer fileUrl={pdfUrl} />
       </Worker>
@@ -26,4 +43,4 @@ const PdfComp = ({ pdfUrl }) => {
   );
 };
 
-export default PdfComp;
+export default Pdf;

@@ -1,18 +1,21 @@
 import { useState, useEffect } from "react";
 import { Button, Modal } from "flowbite-react";
 // import { useNavigate } from "react-router-dom";
-// import PdfComp from "./Pdf";
+import Pdf from "./Pdf";
 import "./dashboard.css";
 import "./modal.css";
 import Joyride from "react-joyride";
-import Loader from "./Loader";
+import Loader, { Donewithparsingmsg } from "./Loader";
 const Dashboard = () => {
   const [sidebarVisible, setSidebarVisible] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [showMessage, setShowMessage] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [messages, setMessages] = useState([]);
+  const [showPdf, setShowPdf] = useState(false);
   const [input, setInput] = useState("");
   const [file, setFile] = useState(null); // To store uploaded file
+  const [pdffile, setPdfFile] = useState(null); // To store uploaded file
   const [fileName, setFileName] = useState(""); // To store the file name
   // const [selectedPDF, setSelectedPDF] = useState(null);
   const [{ run, steps }, setState] = useState({
@@ -44,38 +47,42 @@ const Dashboard = () => {
   };
   // const asking query from the langchain
   const docupload = (file) => {
+    const fileUrl = URL.createObjectURL(file);
+    console.log(fileUrl);
+    setPdfFile(fileUrl);
     setIsLoading(true);
     const formData = new FormData();
     formData.append("pdf", file); // 'pdf' matches the backend's expected parameter name
-    console.log(file); // Add user message to the request
-    //https://smartdocsainode-1.onrender.com
-    fetch("http://127.0.0.1:8000/api/upload-pdf", {
+    //https://fastapi-backend-ppfg.onrender.com
+    fetch("https://fastapi-backend-ppfg.onrender.com/api/upload-pdf", {
       method: "POST",
       body: formData,
     })
       .then((response) => response.json())
       .then((langchainResponse) => {
-        console.log(langchainResponse);
         setIsLoading(false);
+        setShowMessage(true);
+
+        // Hide the message after 2.5 seconds
+        setTimeout(() => {
+          setShowMessage(false);
+        }, 2500);
       })
       .catch((error) => {
         alert("Error uplaoding pdf : ", error);
-        console.error("Error uplaoding pdf : ", error);
         setIsLoading(false);
       });
   };
   const queryUpload = (message) => {
     const formData = new FormData();
     formData.append("query", message);
-    console.log(message);
-    //https://smartdocsainode-1.onrender.com
-    fetch("http://127.0.0.1:8000/api/query-pinecone", {
+    //https://fastapi-backend-ppfg.onrender.com
+    fetch("https://fastapi-backend-ppfg.onrender.com/api/query-pinecone", {
       method: "POST",
       body: formData,
     })
       .then((response) => response.json())
       .then((langchainResponse) => {
-        console.log(langchainResponse);
         // Check if 'answer' exists in the response
         if (langchainResponse) {
           const botMessage = langchainResponse.answer;
@@ -143,10 +150,6 @@ const Dashboard = () => {
 
       // Clear input and file after sending
       setInput("");
-      setFile(null);
-
-      // Step 3: Prepare FormData for file upload
-      console.log(messages);
       queryUpload(input);
     }
   };
@@ -166,7 +169,6 @@ const Dashboard = () => {
       setState((prev) => ({ ...prev, run: false }));
     }
   };
-  console.log(fileName);
   return (
     <div className="dashboard">
       <Joyride
@@ -180,7 +182,7 @@ const Dashboard = () => {
         showProgress
       />
       {isLoading && <Loader />}
-
+      {showMessage && <Donewithparsingmsg />}
       {/* Sidebar */}
       <div
         className={`sidebar ${
@@ -200,16 +202,30 @@ const Dashboard = () => {
           </label>
 
           {/* Uploaded File Section */}
-          {file && fileName && (
+          {pdffile && (
             <div
-              className="file-info flex items-center justify-between bg-white mt-4 p-4 border rounded-md shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105"
+              className="file-info flex items-center justify-between bg-white mt-4 p-2 border rounded-md shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105"
               style={boxShadowStyle}
             >
-              <div className="file-name text-black flex justify-center items-center text-lg font-semibold">
+              <div
+                className="file-name text-black flex justify-center items-center text-lg font-semibold"
+                style={{
+                  marginRight: "15px",
+                  paddingBottom: "8px",
+                  fontSize: "15px",
+                }}
+              >
                 {fileName}
               </div>
               <div className="file-actions flex items-center space-x-2">
                 {/* Remove File Icon */}
+                <button
+                  className="text-red-600 hover:text-red-800 text-xl font-semibold"
+                  style={{ marginRight: "15px" }}
+                  onClick={() => setShowPdf(true)}
+                >
+                  <span className="text-lg">&#128065;</span>
+                </button>
                 <button
                   className="text-red-600 hover:text-red-800 text-xl font-semibold"
                   onClick={handleRemoveFile}
@@ -266,17 +282,39 @@ const Dashboard = () => {
       </div>
 
       {/* Pdf show container  */}
-      {/* {file && (
+      {showPdf && (
         <div
           style={{
-            width: "30%",
-            borderLeft: "1px solid #ccc",
-            padding: "1rem",
+            position: "relative", // Ensure that the cross button is positioned relative to this container
           }}
         >
-          <PdfComp pdfUrl={file} />
+          {/* Cross Button */}
+          <button
+            style={{
+              position: "absolute",
+              top: "25px",
+              right: "250px",
+              background: "white",
+              color: "black",
+              border: "none",
+              fontSize: "24px",
+              cursor: "pointer",
+              width: "150px",
+              zIndex: 10000,
+              fontWeight: "700",
+              boxShadow:
+                "rgba(0, 0, 0, 0.25) 0px 14px 28px, rgba(0, 0, 0, 0.22) 0px 10px 10px", // Ensure the button is above the PDF viewer
+            }}
+            onClick={() => setShowPdf(false)} // Hide the PDF viewer when clicked
+          >
+            Close Pdf
+          </button>
+
+          {/* PDF Viewer */}
+          <Pdf pdfUrl={pdffile} />
         </div>
-      )} */}
+      )}
+
       {/* Modal pop-up */}
       <Modal
         dismissible

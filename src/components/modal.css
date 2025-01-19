@@ -39,7 +39,7 @@
     /* Center horizontally */
     transform: translate(-50%, -50%);
     /* Adjust position to perfectly center */
-    z-index: 9999;
+    z-index: 9;
     /* Ensure the loader is above other elements */
     display: flex;
     justify-content: center;
