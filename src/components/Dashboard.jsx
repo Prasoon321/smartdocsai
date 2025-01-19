@@ -28,13 +28,13 @@ const Dashboard = () => {
         target: "#startchat",
       },
       {
-        content: <h2>Sign up to unlock powerful features!</h2>,
+        content: <h2>Upload your pdf first!</h2>,
         placement: "right",
         target: "#secondstep",
         title: "Upload your pdf",
       },
       {
-        content: <h2>Learn how to make the most of our platform!</h2>,
+        content: <h2>Now ask from pdf!</h2>,
         placement: "bottom",
         target: "#thirdstep",
         title: "Ask question from your pdf",
