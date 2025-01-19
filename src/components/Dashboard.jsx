@@ -24,14 +24,16 @@ const Dashboard = () => {
     console.log(file); // Add user message to the request
 
     // Step 5: Send FormData to FastAPI
-    fetch("https://smartdocaifastapi-1.onrender.com/api/ask-query", {
+    //https://smartdocsainode-1.onrender.com
+    fetch("http://127.0.0.1:8000/api/ask-query", {
       method: "POST",
       body: formData,
     })
       .then((response) => response.json())
       .then((langchainResponse) => {
+        console.log(langchainResponse);
         // Check if 'answer' exists in the response
-        if (langchainResponse && langchainResponse.answer) {
+        if (langchainResponse) {
           const botMessage = langchainResponse.answer;
           setMessages((prevMessages) => {
             const updatedMessages = [...prevMessages];
@@ -177,7 +179,7 @@ const Dashboard = () => {
         </div>
       </div>
       {/* Pdf show container  */}
-      {/* {selectedPDF && (
+      {/* {file && (
         <div
           style={{
             width: "30%",
@@ -185,7 +187,7 @@ const Dashboard = () => {
             padding: "1rem",
           }}
         >
-          <PdfComp pdfUrl={selectedPDF} />
+          <PdfComp pdfUrl={file} />
         </div>
       )} */}
       {/* Modal pop-up */}
