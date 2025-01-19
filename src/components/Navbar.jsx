@@ -133,6 +133,7 @@ const Navbar = () => {
                 <a
                   className=" py-2 px-3 rounded-md flex items-center justify-center"
                   style={{ cursor: "pointer" }}
+                  onClick={handleLogin}
                   id="stepsaccount"
                 >
                   <div

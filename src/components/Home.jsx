@@ -7,11 +7,10 @@ import { useAuth0 } from "@auth0/auth0-react";
 const Home = () => {
   const navigate = useNavigate();
 
-  const [isauthenticated, setIsauthenticated] = useState(false);
   const { user, loginWithRedirect, isAuthenticated } = useAuth0();
   useEffect(() => {
-    if (isAuthenticated && user) {
-      setIsauthenticated(true);
+    if (isAuthenticated) {
+      navigate("/dashboard");
       // Storing relevant user details in localStorage
       localStorage.setItem(
         "user",
