@@ -1,7 +1,6 @@
 import { Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import logo from "../assets/logo.png";
-import { navItems } from "../constants";
 import { useAuth0 } from "@auth0/auth0-react";
 import AlterComponent from "../components/AlterComponent";
 import { useNavigate } from "react-router-dom";
@@ -10,6 +9,8 @@ import "./modal.css";
 const Navbar = () => {
   const navigate = useNavigate();
   const [usercred, Setusercred] = useState({});
+  const [userdeatil, SetUserDeatil] = useState({});
+  const [isauth, SetIsAuth] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [{ run, steps }, setState] = useState({
     run: false,
@@ -75,8 +76,12 @@ const Navbar = () => {
     if (!hasCompletedTour) {
       setState((prev) => ({ ...prev, run: true }));
     }
+    const userinfo = JSON.parse(localStorage.getItem("user"));
+    if (userinfo) {
+      SetIsAuth(true);
+      SetUserDeatil({ name: userinfo.name, photo: userinfo.picture });
+    }
   }, []);
-
   const handleJoyrideCallback = (data) => {
     const { status } = data; // status includes information like "finished" or "skipped"
     const finishedStatuses = ["finished", "skipped"];
@@ -87,7 +92,7 @@ const Navbar = () => {
     }
   };
   return (
-    <nav className="sticky top-0 z-50 py-3 backdrop-blur-lg border-b border-neutral-700/80">
+    <nav className="sticky top-0 z-50 py-1 backdrop-blur-lg border-b border-neutral-700/80">
       <Joyride
         continuous
         callback={handleJoyrideCallback}
@@ -122,15 +127,47 @@ const Navbar = () => {
               <span>View on Github</span>
             </button>
           </ul>
-          <div className=" lg:flex justify-center space-x-12 items-center">
-            <a
-              className="bg-gradient-to-r from-orange-500 to-orange-800 py-2 px-3 rounded-md"
-              onClick={handleLogin}
-              style={{ cursor: "pointer" }}
-              id="stepsaccount"
-            >
-              Create an account
-            </a>
+          <div className="lg:flex justify-center space-x-12 items-center">
+            {isauth ? (
+              <>
+                <a
+                  className=" py-2 px-3 rounded-md flex items-center justify-center"
+                  style={{ cursor: "pointer" }}
+                  id="stepsaccount"
+                >
+                  <div
+                    style={{
+                      width: "50px", // Fixed width
+                      height: "50px", // Fixed height to maintain a square shape
+                      overflow: "hidden", // Ensures the image doesn't overflow the container
+                      borderRadius: "50%", // Makes the container circular if you want a round image
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <img
+                      src={userdeatil.photo}
+                      style={{
+                        width: "100%", // Ensures the image fits within the container's width
+                        height: "100%", // Ensures the image fits within the container's height
+                        objectFit: "cover", // Ensures the image covers the area without stretching
+                      }}
+                      alt={userdeatil.name}
+                    />
+                  </div>
+                </a>
+              </>
+            ) : (
+              <a
+                className="bg-gradient-to-r from-orange-500 to-orange-800 py-2 px-3 rounded-md"
+                onClick={handleLogin}
+                style={{ cursor: "pointer" }}
+                id="stepsaccount"
+              >
+                Create an account
+              </a>
+            )}
           </div>
 
           <div className="lg:hidden md:flex flex-col justify-end">
