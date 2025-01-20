@@ -1,6 +1,5 @@
 // PDFViewer.jsx
 import { Worker, Viewer } from "@react-pdf-viewer/core";
-import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 import { useEffect, useState } from "react";
 
 const Pdf = ({ pdfUrl }) => {

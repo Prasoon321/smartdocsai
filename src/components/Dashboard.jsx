@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { Button, Modal } from "flowbite-react";
+import { pdfjs } from "react-pdf";
 // import { useNavigate } from "react-router-dom";
-import Pdf from "./Pdf";
+// import Pdf from "./Pdf";
 import "./dashboard.css";
 import "./modal.css";
 import Joyride from "react-joyride";
 import Loader, { Donewithparsingmsg } from "./Loader";
+import PdfComp from "./Loadpdf";
 const Dashboard = () => {
   const [sidebarVisible, setSidebarVisible] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -41,6 +43,9 @@ const Dashboard = () => {
       },
     ],
   });
+  pdfjs.GlobalWorkerOptions.workerSrc =
+    "https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js";
+
   useEffect(() => {
     if (window.innerWidth <= 576) {
       // Adjust the breakpoint as needed
@@ -57,6 +62,7 @@ const Dashboard = () => {
     console.log(fileUrl);
     setPdfFile(fileUrl);
     setIsLoading(true);
+    setFileName(file.name);
     const formData = new FormData();
     formData.append("pdf", file); // 'pdf' matches the backend's expected parameter name
     //https://fastapi-backend-ppfg.onrender.com
@@ -122,6 +128,7 @@ const Dashboard = () => {
     const uploadedFile = files[0];
     if (uploadedFile) {
       setFile(uploadedFile);
+      setPdfFile(uploadedFile);
       setFileName(uploadedFile.name);
       setOpenModal(false);
       docupload(uploadedFile);
@@ -143,10 +150,11 @@ const Dashboard = () => {
   const handleRemoveFile = () => {
     setFile(null);
     setFileName("");
+    setPdfFile(null);
   };
   // Step 1: Handle user clicking the "Send" button or pressing Enter
   const handleSendMessage = () => {
-    // Step 2: Capture input and file
+    // Step 2: Capture input and file.
     if (input.trim()) {
       setMessages((prevMessages) => [
         ...prevMessages,
@@ -177,6 +185,7 @@ const Dashboard = () => {
   };
   return (
     <div className="dashboard">
+      {/* <PdfComp/> */}
       <Joyride
         continuous
         callback={handleJoyrideCallback}
@@ -196,7 +205,16 @@ const Dashboard = () => {
         } w-64 min-w-[250px]`}
       >
         <div className="pdf-upload-app">
-          <h2 className="text-2xl font-bold mb-4">PDF Query App</h2>
+          <div className="flex justify-between">
+            <h2 className="text-2xl font-bold mb-4">PDF Query App</h2>
+
+            <div
+              className="hamburger-menu"
+              onClick={() => setSidebarVisible(!sidebarVisible)}
+            >
+              <span className="text-teal-950 text-3xl">X</span>
+            </div>
+          </div>
 
           {/* Upload Button */}
           <label
@@ -317,7 +335,7 @@ const Dashboard = () => {
           </button>
 
           {/* PDF Viewer */}
-          <Pdf pdfUrl={pdffile} />
+          <PdfComp pdfFile={pdffile} />
         </div>
       )}
 

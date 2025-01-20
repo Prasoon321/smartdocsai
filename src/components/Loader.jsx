@@ -12,7 +12,7 @@ const Loader = () => {
           }}
         >
           <div className="terminal-header">
-            <div className="terminal-title">Status : Pending</div>
+            <div className="terminal-title">Status </div>
             <div className="terminal-controls">
               <div className="control close"></div>
               <div className="control minimize"></div>
