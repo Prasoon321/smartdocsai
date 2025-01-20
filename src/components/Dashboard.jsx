@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button, Modal } from "flowbite-react";
-import { pdfjs } from "react-pdf";
+// import { pdfjs } from "react-pdf";
 // import { useNavigate } from "react-router-dom";
 import Pdf from "./Pdf";
 import "./dashboard.css";
@@ -43,14 +43,14 @@ const Dashboard = () => {
       },
     ],
   });
-  pdfjs.GlobalWorkerOptions.workerSrc =
-    "https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js";
-  useEffect(() => {
-    if (window.innerWidth <= 576) {
-      // Adjust the breakpoint as needed
-      setSidebarVisible(false);
-    }
-  }, []);
+  // pdfjs.GlobalWorkerOptions.workerSrc =
+  //   "https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js";
+  // useEffect(() => {
+  //   if (window.innerWidth <= 576) {
+  //     // Adjust the breakpoint as needed
+  //     setSidebarVisible(false);
+  //   }
+  // }, []);
   const boxShadowStyle = {
     boxShadow:
       "rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px",
