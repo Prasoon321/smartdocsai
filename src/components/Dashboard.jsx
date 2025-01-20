@@ -2,12 +2,12 @@ import { useState, useEffect } from "react";
 import { Button, Modal } from "flowbite-react";
 import { pdfjs } from "react-pdf";
 // import { useNavigate } from "react-router-dom";
-// import Pdf from "./Pdf";
+import Pdf from "./Pdf";
 import "./dashboard.css";
 import "./modal.css";
 import Joyride from "react-joyride";
 import Loader, { Donewithparsingmsg } from "./Loader";
-import PdfComp from "./Loadpdf";
+// import PdfComp from "./Loadpdf";
 const Dashboard = () => {
   const [sidebarVisible, setSidebarVisible] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -45,7 +45,6 @@ const Dashboard = () => {
   });
   pdfjs.GlobalWorkerOptions.workerSrc =
     "https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js";
-
   useEffect(() => {
     if (window.innerWidth <= 576) {
       // Adjust the breakpoint as needed
@@ -212,7 +211,7 @@ const Dashboard = () => {
               className="hamburger-menu"
               onClick={() => setSidebarVisible(!sidebarVisible)}
             >
-              <span className="text-teal-950 text-3xl">X</span>
+              <span className="text-white text-3xl">X</span>
             </div>
           </div>
 
@@ -335,7 +334,8 @@ const Dashboard = () => {
           </button>
 
           {/* PDF Viewer */}
-          <PdfComp pdfFile={pdffile} />
+          {/* <PdfComp pdfFile={pdffile} /> */}
+          <Pdf pdfFile={pdffile} />
         </div>
       )}
 
