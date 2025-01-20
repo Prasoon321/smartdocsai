@@ -11,8 +11,8 @@ const Pdf = ({ pdfFile }) => {
       // Check if the pdfFile is a valid URL
       const isValidUrl = (url) => {
         try {
-          new URL(url); // Try to create a new URL object to check if it's valid
-          return true;
+          const Url = new URL(url); // Try to create a new URL object to check if it's valid
+          return Url;
         } catch (e) {
           return false;
         }
@@ -55,7 +55,7 @@ const Pdf = ({ pdfFile }) => {
         zIndex: 999,
       }}
     >
-      <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js">
+      <Worker workerUrl="https://unpkg.com/pdfjs-dist@2.6.347/build/pdf.worker.min.js">
         <Viewer fileUrl={validUrl} />
       </Worker>
     </div>
