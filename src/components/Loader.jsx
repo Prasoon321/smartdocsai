@@ -19,7 +19,7 @@ const Loader = () => {
               <div className="control maximize"></div>
             </div>
           </div>
-          <div className="text">Parsing Pdf...</div>
+          <div className="text">Parsing Document...</div>
         </div>
       </div>
     </div>
