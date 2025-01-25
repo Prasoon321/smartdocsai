@@ -65,7 +65,8 @@ const Dashboard = () => {
     const formData = new FormData();
     formData.append("pdf", file); // 'pdf' matches the backend's expected parameter name
     //https://fastapi-backend-ppfg.onrender.com
-    fetch("https://fastapi-backend-ppfg.onrender.com/api/upload-pdf", {
+    // http://127.0.0.1:8000
+    fetch("http://127.0.0.1:8000/api/upload-pdf", {
       method: "POST",
       body: formData,
     })
@@ -73,7 +74,7 @@ const Dashboard = () => {
       .then((langchainResponse) => {
         setIsLoading(false);
         setShowMessage(true);
-
+        console.log(langchainResponse.message);
         // Hide the message after 2.5 seconds
         setTimeout(() => {
           setShowMessage(false);
@@ -88,7 +89,8 @@ const Dashboard = () => {
     const formData = new FormData();
     formData.append("query", message);
     //https://fastapi-backend-ppfg.onrender.com
-    fetch("https://fastapi-backend-ppfg.onrender.com/api/query-pinecone", {
+    // http://127.0.0.1:8000
+    fetch("http://127.0.0.1:8000/api/query-pinecone", {
       method: "POST",
       body: formData,
     })
@@ -97,6 +99,7 @@ const Dashboard = () => {
         // Check if 'answer' exists in the response
         if (langchainResponse) {
           const botMessage = langchainResponse.answer;
+          console.log(langchainResponse.detail);
           setMessages((prevMessages) => {
             const updatedMessages = [...prevMessages];
             updatedMessages[updatedMessages.length - 1] = {
