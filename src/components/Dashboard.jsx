@@ -96,7 +96,7 @@ const Dashboard = () => {
       };
       reader.readAsText(file); // Read the file as text
     }
-    fetch("http://127.0.0.1:8000/api/upload-file", {
+    fetch("https://fastapi-backend-ppfg.onrender.com/api/upload-file", {
       method: "POST",
       body: formData,
     })
@@ -121,7 +121,7 @@ const Dashboard = () => {
     formData.append("query", message);
     //https://fastapi-backend-ppfg.onrender.com
     // http://127.0.0.1:8000
-    fetch("http://127.0.0.1:8000/api/query-pinecone", {
+    fetch("https://fastapi-backend-ppfg.onrender.com/api/query-pinecone", {
       method: "POST",
       body: formData,
     })
