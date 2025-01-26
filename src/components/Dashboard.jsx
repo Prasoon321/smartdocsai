@@ -6,13 +6,19 @@ import Pdf from "./Pdf";
 import "./dashboard.css";
 import "./modal.css";
 import Joyride from "react-joyride";
-import Loader, { Donewithparsingmsg } from "./Loader";
+import Loader from "./Loader";
+import ReactFileViewer from "react-file-viewer";
 // import PdfComp from "./Loadpdf";
 const Dashboard = () => {
   const [sidebarVisible, setSidebarVisible] = useState(true);
+  const [fileextension, setfileextensiom] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [urlcreate, setUrlcreate] = useState(null);
   const [showMessage, setShowMessage] = useState(false);
   const [openModal, setOpenModal] = useState(false);
+  const [fileContent, setFileContent] = useState(null);
+  const [showtxtfile, setShowtxtfile] = useState(false);
+  const [showdocfile, setShowdocfile] = useState(false);
   const [messages, setMessages] = useState([]);
   const [showPdf, setShowPdf] = useState(false);
   const [input, setInput] = useState("");
@@ -43,6 +49,15 @@ const Dashboard = () => {
       },
     ],
   });
+  const showdocument = () => {
+    if (fileextension === "txt") {
+      setShowtxtfile(true);
+    } else if (fileextension === "pdf") {
+      setShowPdf(true);
+    } else if (fileextension === "doc") {
+      setShowdocfile(true);
+    }
+  };
   // pdfjs.GlobalWorkerOptions.workerSrc =
   //   "https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js";
   // useEffect(() => {
@@ -57,16 +72,31 @@ const Dashboard = () => {
   };
   // const asking query from the langchain
   const docupload = (file) => {
+    const fileExtension = file.name.split(".").pop().toLowerCase();
+    const fileType = file.type;
     const fileUrl = URL.createObjectURL(file);
     console.log(fileUrl);
-    setPdfFile(fileUrl);
     setIsLoading(true);
     setFileName(file.name);
     const formData = new FormData();
-    formData.append("pdf", file); // 'pdf' matches the backend's expected parameter name
-    //https://fastapi-backend-ppfg.onrender.com
-    // http://127.0.0.1:8000
-    fetch("http://127.0.0.1:8000/api/upload-pdf", {
+    formData.append("file", file);
+    if (fileExtension === "pdf" && fileType === "application/pdf") {
+      setPdfFile(fileUrl);
+      setfileextensiom("pdf");
+    }
+    if (fileExtension === "doc" || fileExtension === "docx") {
+      setfileextensiom("doc");
+      setUrlcreate(fileUrl);
+    }
+    if (file && file.type === "text/plain") {
+      setfileextensiom("txt");
+      const reader = new FileReader();
+      reader.onload = () => {
+        setFileContent(reader.result); // Set the file content to state
+      };
+      reader.readAsText(file); // Read the file as text
+    }
+    fetch("http://127.0.0.1:8000/api/upload-file", {
       method: "POST",
       body: formData,
     })
@@ -81,10 +111,11 @@ const Dashboard = () => {
         }, 2500);
       })
       .catch((error) => {
-        alert("Error uplaoding pdf : ", error);
+        alert("Error uploading file: ", error);
         setIsLoading(false);
       });
   };
+
   const queryUpload = (message) => {
     const formData = new FormData();
     formData.append("query", message);
@@ -114,6 +145,7 @@ const Dashboard = () => {
             const updatedMessages = [...prevMessages];
             updatedMessages[updatedMessages.length - 1] = {
               type: "bot",
+
               text: "Sorry, I couldn't find an answer similar to your question in context to the pdf",
             };
             return updatedMessages;
@@ -140,11 +172,28 @@ const Dashboard = () => {
   // Handle file upload via input
   const handleFileUpload = (files) => {
     const uploadedFile = files[0];
+
     if (uploadedFile) {
-      setFile(uploadedFile);
-      setOpenModal(false);
-      setFileName(uploadedFile.name);
-      docupload(uploadedFile);
+      const fileType = uploadedFile.type;
+
+      // Check if the file type is valid
+      const validFileTypes = [
+        "application/pdf",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "text/plain",
+      ];
+
+      if (validFileTypes.includes(fileType)) {
+        setFile(uploadedFile);
+        setOpenModal(false);
+        setFileName(uploadedFile.name);
+        docupload(uploadedFile);
+      } else {
+        alert(
+          "Unsupported file type. Please upload a PDF, Word document, or text file."
+        );
+      }
     }
   };
 
@@ -199,7 +248,7 @@ const Dashboard = () => {
         showProgress
       />
       {isLoading && <Loader />}
-      {showMessage && <Donewithparsingmsg />}
+      {/* {showMessage && <Donewithparsingmsg />} */}
       {/* Sidebar */}
       <div
         className={`sidebar ${
@@ -214,7 +263,9 @@ const Dashboard = () => {
               className="hamburger-menu"
               onClick={() => setSidebarVisible(!sidebarVisible)}
             >
-              <span className="text-white text-3xl">X</span>
+              <span className="text-white text-3xl" style={{ color: "red" }}>
+                X
+              </span>
             </div>
           </div>
 
@@ -228,7 +279,7 @@ const Dashboard = () => {
           </label>
 
           {/* Uploaded File Section */}
-          {pdffile && (
+          {fileextension && (
             <div
               className="file-info flex items-center justify-between bg-white mt-4 p-2 border rounded-md shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105"
               style={boxShadowStyle}
@@ -244,14 +295,15 @@ const Dashboard = () => {
                 {fileName}
               </div>
               <div className="file-actions flex items-center space-x-2">
-                {/* Remove File Icon */}
+                {/* Show File Icon */}
                 <button
                   className="text-red-600 hover:text-red-800 text-xl font-semibold"
                   style={{ marginRight: "15px" }}
-                  onClick={() => setShowPdf(true)}
+                  onClick={showdocument}
                 >
                   <span className="text-lg">&#128065;</span>
                 </button>
+                {/* Remove File Icon */}
                 <button
                   className="text-red-600 hover:text-red-800 text-xl font-semibold"
                   onClick={handleRemoveFile}
@@ -341,6 +393,42 @@ const Dashboard = () => {
           <Pdf pdfFile={pdffile} />
         </div>
       )}
+      {/* Txt file show up  */}
+      {showtxtfile && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <span
+                className="close-btn"
+                onClick={() => setShowtxtfile(false)} // Close modal
+              >
+                &times;
+              </span>
+              <h2>File Content</h2>
+            </div>
+            <div className="file-content">
+              <pre style={{ color: "black" }}>{fileContent}</pre>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Show DOC File Content */}
+      {showdocfile && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <div className="modal-title">Viewing {fileName}</div>
+              <button
+                className="close-btn"
+                onClick={() => setShowdocfile(false)}
+              >
+                &times;
+              </button>
+            </div>
+            <ReactFileViewer filePath={urlcreate} />
+          </div>
+        </div>
+      )}
 
       {/* Modal pop-up */}
       <Modal
@@ -372,7 +460,7 @@ const Dashboard = () => {
             </p>
             <input
               type="file"
-              accept=".pdf, .doc, .docx"
+              accept=".pdf, .doc, .docx, .txt" // Updated to allow .txt files
               onChange={(e) => handleFileUpload(e.target.files)} // Handle file selection
               className="hidden"
               id="file-input"

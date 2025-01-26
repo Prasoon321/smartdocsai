@@ -1,4 +1,4 @@
-import { Menu, X } from "lucide-react";
+// import { Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import logo from "../assets/logo.png";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -37,8 +37,11 @@ const Navbar = () => {
   });
 
   const [isauthenticated, setIsauthenticated] = useState(false);
-  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+  // const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const { user, loginWithRedirect, isAuthenticated } = useAuth0();
+  const navigatehome = () => {
+    navigate("/"); // Navigate to the home page ("/" is typically the home route)
+  };
   const openLink = () => {
     window.open("https://github.com/Prasoon321/smartdocsai.git", "_blank");
   };
@@ -51,9 +54,9 @@ const Navbar = () => {
       });
     }
   };
-  const toggleNavbar = () => {
-    setMobileDrawerOpen(!mobileDrawerOpen);
-  };
+  // const toggleNavbar = () => {
+  //   setMobileDrawerOpen(!mobileDrawerOpen);
+  // };
   useEffect(() => {
     if (isAuthenticated && user) {
       // Storing relevant user details in localStorage
@@ -107,7 +110,13 @@ const Navbar = () => {
       <div className="container px-4 mx-auto relative lg:text-sm">
         <div className="flex justify-between items-center">
           <div className="flex items-center flex-shrink-0">
-            <img className="h-10 w-10 mr-2" src={logo} alt="Logo" />
+            <img
+              className="h-10 w-10 mr-2"
+              onClick={navigatehome}
+              style={{ cursor: "pointer" }}
+              src={logo}
+              alt="Logo"
+            />
             <span className="text-xl tracking-tight">SmartDocsAi</span>
           </div>
           <ul>
@@ -124,7 +133,7 @@ const Navbar = () => {
                   fill="currentcolor"
                 ></path>
               </svg>
-              <span>View on Github</span>
+              <span>Github</span>
             </button>
           </ul>
           <div className="lg:flex justify-center space-x-12 items-center">
@@ -171,13 +180,13 @@ const Navbar = () => {
             )}
           </div>
 
-          <div className="lg:hidden md:flex flex-col justify-end">
+          {/* <div className="lg:hidden md:flex flex-col justify-end">
             <button onClick={toggleNavbar}>
               {mobileDrawerOpen ? <X /> : <Menu />}
             </button>
-          </div>
+          </div> */}
         </div>
-        {mobileDrawerOpen && (
+        {/* {mobileDrawerOpen && (
           <div className="fixed right-0 z-20 bg-neutral-900 w-full p-12 flex flex-col justify-center items-center lg:hidden">
             <button className="btn-github">
               <svg
@@ -204,7 +213,7 @@ const Navbar = () => {
               </a>
             </div>
           </div>
-        )}
+        )} */}
       </div>
     </nav>
   );

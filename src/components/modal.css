@@ -54,7 +54,6 @@
     font-size: 1.8em;
     padding: 1.5em 1em;
     width: 15em;
-    width: 10em;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     border-radius: 4px;
     position: relative;
@@ -112,8 +111,9 @@
     overflow: hidden;
     border-right: 0.2em solid green;
     animation:
-        typeAndDelete 4s steps(11) infinite,
-        blinkCursor 0.5s step-end infinite alternate;
+        typeAndDelete 5s steps(11) infinite,
+        blinkCursor 0.5s step-end infinite alternate,
+        changeText 4s steps(1) infinite;
     margin-top: 1.5em;
 }
 
@@ -132,7 +132,7 @@
 
     45%,
     55% {
-        width: 10.2em;
+        width: 12.2em;
     }
 
     /* adjust width based on content */
@@ -140,4 +140,101 @@
     100% {
         width: 0;
     }
+}
+
+@keyframes changeText {
+    0% {
+        content: "Parsing Document.....";
+    }
+
+    20% {
+        content: "Parsing Document.....";
+    }
+
+    40% {
+        content: "Embedding Document....";
+    }
+
+    60% {
+        content: "Embedding Document....";
+    }
+
+    80% {
+        content: "Storing Embedding...";
+    }
+
+    100% {
+        content: "Storing Embedding...";
+    }
+}
+
+/* Overlay for modal background */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Semi-transparent background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    /* Ensure it overlays on top of everything */
+}
+
+/* Modal container */
+.modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 600px;
+    width: 80%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow-y: auto;
+    max-height: 90vh;
+    /* Increased height */
+}
+
+/* Header section inside modal */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Close button */
+.close-btn {
+    font-size: 24px;
+    cursor: pointer;
+    color: #333;
+    background: none;
+    border: none;
+}
+
+/* Text content of the file */
+.file-content {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #f4f4f4;
+    border-radius: 5px;
+    white-space: pre-wrap;
+    max-height: 60vh;
+    /* Increased height for content */
+    overflow-y: auto;
+    /* Enable scroll if content is too long */
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* Styling for the text */
+pre {
+    margin: 0;
+    white-space: pre-wrap;
+    /* Ensure content wraps correctly */
+    word-wrap: break-word;
+    /* Prevent content overflow */
 }

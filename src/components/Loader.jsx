@@ -1,6 +1,23 @@
 import "./modal.css";
+import { useState, useEffect } from "react";
 
 const Loader = () => {
+  const [text, setText] = useState("Parsing Document...");
+
+  useEffect(() => {
+    const timer1 = setTimeout(() => {
+      setText("Embedding Document...");
+    }, 2500); // After 1 second, change to "Embedding Document..."
+
+    const timer2 = setTimeout(() => {
+      setText("Storing Embedding...");
+    }, 5000); // After 2 more seconds, change to "Storing Embedding..."
+
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+    };
+  }, []);
   return (
     <div>
       <div className="loader-container">
@@ -19,7 +36,7 @@ const Loader = () => {
               <div className="control maximize"></div>
             </div>
           </div>
-          <div className="text">Parsing Pdf...</div>
+          <div className="text">{text}</div>
         </div>
       </div>
     </div>

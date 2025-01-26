@@ -68,7 +68,7 @@ body {
 }
 
 .hamburger-menu {
-    flex-direction: column;
+    flex-direction: row;
     cursor: pointer;
     margin-left: 10px;
 }
@@ -86,9 +86,9 @@ body {
 
 .hamburger-menu span {
     color: black;
-    width: 25px;
-    height: 3px;
-    margin: 4px 0;
+    width: 11px;
+    height: 20px;
+    margin: 3px 0;
 }
 
 .chat-messages {
