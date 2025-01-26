@@ -39,13 +39,13 @@ const Home = () => {
           Search and Analyze Your
           <span className="bg-gradient-to-r from-orange-500 to-red-800 text-transparent bg-clip-text">
             {" "}
-            PDFs or Docs Effortlessly
+            PDFs , Docs and Text file Effortlessly
           </span>
         </h1>
         <p className="mt-10 text-lg text-center text-neutral-500 max-w-4xl">
           Simplify your document workflows with our powerful platform. Extract,
-          search, and analyze data from PDFs and documents effortlessly. Unlock
-          insights, save time, and manage your files smarter today!
+          search, and analyze data from PDFs , Docs and text files effortlessly.
+          Unlock insights, save time, and manage your files smarter today!
         </p>
         <div className="flex justify-center my-10">
           <a

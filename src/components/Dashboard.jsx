@@ -7,7 +7,6 @@ import "./dashboard.css";
 import "./modal.css";
 import Joyride from "react-joyride";
 import Loader from "./Loader";
-import ReactFileViewer from "react-file-viewer";
 // import PdfComp from "./Loadpdf";
 const Dashboard = () => {
   const [sidebarVisible, setSidebarVisible] = useState(true);
@@ -160,12 +159,15 @@ const Dashboard = () => {
   // Handle drag and drop
   const handleFileDrop = (files) => {
     const uploadedFile = files[0];
+    const fileUrl = URL.createObjectURL(file);
+
     if (uploadedFile) {
       setFile(uploadedFile);
-      setPdfFile(uploadedFile);
       setFileName(uploadedFile.name);
       setOpenModal(false);
       docupload(uploadedFile);
+      setUrlcreate(fileUrl);
+      setPdfFile(fileUrl);
     }
   };
 
@@ -257,7 +259,7 @@ const Dashboard = () => {
       >
         <div className="pdf-upload-app">
           <div className="flex justify-between">
-            <h2 className="text-2xl font-bold mb-4">PDF Query App</h2>
+            <h2 className="text-2xl font-bold mb-4">Query App</h2>
 
             <div
               className="hamburger-menu"
@@ -274,7 +276,7 @@ const Dashboard = () => {
             className="upload-btn inline-block w-full cursor-pointer bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
             id="secondstep"
           >
-            Upload PDF
+            Upload Pdf , Doc , txt
             <input hidden onClick={() => setOpenModal(true)} />
           </label>
 
@@ -409,23 +411,6 @@ const Dashboard = () => {
             <div className="file-content">
               <pre style={{ color: "black" }}>{fileContent}</pre>
             </div>
-          </div>
-        </div>
-      )}
-      {/* Show DOC File Content */}
-      {showdocfile && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="modal-header">
-              <div className="modal-title">Viewing {fileName}</div>
-              <button
-                className="close-btn"
-                onClick={() => setShowdocfile(false)}
-              >
-                &times;
-              </button>
-            </div>
-            <ReactFileViewer filePath={urlcreate} />
           </div>
         </div>
       )}
