@@ -1,0 +1,10 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.25.1
+ignore: {}
+# patches apply the minimum changes required to fix a vulnerability
+patch:
+  'npm:lodash:20180130':
+    - react-file-viewer > mammoth > xmlbuilder > lodash:
+        patched: '2025-01-26T13:58:08.694Z'
+        id: 'npm:lodash:20180130'
+        path: react-file-viewer > mammoth > xmlbuilder > lodash
