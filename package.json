@@ -13,7 +13,7 @@
     "@auth0/auth0-react": "^2.2.4",
     "@preline/overlay": "^2.5.2",
     "@react-pdf-viewer/core": "^3.4.0",
-    "@react-pdf/renderer": "^4.1.6",
+    "@react-pdf/renderer": "^4.2.2",
     "file-saver": "^2.0.5",
     "flowbite-react": "^0.10.2",
     "lucide-react": "^0.344.0",
